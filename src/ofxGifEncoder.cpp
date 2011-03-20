@@ -25,6 +25,11 @@ ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, 
 //--------------------------------------------------------------
 void ofxGifEncoder::save (vector <ofxGifFrame *> frames, string fileName, int nColors) {
     
+    if (nColors < 2 || nColors > 256) {
+        ofLog(OF_LOG_WARNING, "nColors must be between 2 and 256. your gif won't be saved");
+        return;
+    }
+    
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
 	
@@ -59,7 +64,7 @@ void ofxGifEncoder::save (vector <ofxGifFrame *> frames, string fileName, int nC
         // bmp =  FreeImage_ColorQuantize(bmp, FIQ_NNQUANT);
 		
 		// if we want to set a reduced color palette (2 to 256);
-        bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, 256);
+        bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)
 		// you can set a different dither pattern for each frame

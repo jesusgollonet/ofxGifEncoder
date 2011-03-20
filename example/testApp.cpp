@@ -2,7 +2,6 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    
     frameW = 320;
     frameH = 240;
     vid.initGrabber(frameW,frameH);
@@ -34,7 +33,7 @@ void testApp::keyReleased(int key){
             captureFrame();
             break;
         case 's':
-            ofxGifEncoder::save(pxs, "test.gif");
+            ofxGifEncoder::save(pxs, "test.gif", 256);
             break;
         default:
             break;

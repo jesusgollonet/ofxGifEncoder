@@ -22,7 +22,7 @@ class ofxGifEncoder {
     
     public: 
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
-        static void save(vector <ofxGifFrame *> frames, string fileName, int nColors = 256);
+        static void save(vector <ofxGifFrame *> frames, string fileName = "test.gif" , int nColors = 256);
     private:
         static void swapRgb(ofxGifFrame * pix);
     
