@@ -8,13 +8,22 @@
 #include "ofMain.h"
 
 
+// similar to ofPixels
+typedef struct {
+	unsigned char * pixels;
+    int width;
+    int height;
+    float duration;  // seconds
+	int bitsPerPixel;
+} ofxGifFrame;
 
 
 class ofxGifEncoder {
     
     public: 
-        static void save(vector <ofPixels *> frames, string fileName);
+        static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
+        static void save(vector <ofxGifFrame *> frames, string fileName); // if fps is specified, it'll override individual durations
     private:
-        static void swapRgb(ofPixels * pix, int width, int height, int bitsPerPixel);
+        static void swapRgb(ofxGifFrame * pix);
     
 };
