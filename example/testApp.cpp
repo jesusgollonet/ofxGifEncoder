@@ -6,6 +6,7 @@ void testApp::setup(){
     frameH = 240;
     vid.initGrabber(frameW,frameH);
     nFrames = 0;
+	ofBackground(50, 40, 50);
 }
 
 //--------------------------------------------------------------
@@ -19,6 +20,8 @@ void testApp::draw(){
         txs[i]->draw(i* (frameW/2 + 5), frameH, frameW/2, frameH/2);
     }
     vid.draw(0, 0);
+	
+	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
 }
 
 //--------------------------------------------------------------

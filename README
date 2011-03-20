@@ -23,6 +23,7 @@ CAVEATS:
 
 TODO:
 	- Implement freeimage's dithering.
+	- Transaparent gifs!
 	- Give the option to specify general fps instead of for each frame.
 	- Thread the saving.
 	- Provide option to choose palette?
