@@ -80,12 +80,15 @@ void ofxGifEncoder::save(vector <ofxGifFrame *> frames, string fileName, int nCo
 void ofxGifEncoder::save(string fileName, int nColors) {
 	getInstance();
 	
-	cout << "calling the save function" << endl;
-	
 	if (nColors < 2 || nColors > 256) {
         ofLog(OF_LOG_WARNING, "nColors must be between 2 and 256. your gif won't be saved");
         return;
     }
+	
+	if(__instance->_gifFrames.size() < 1) {
+		ofLog(OF_LOG_ERROR, "ofxGifEncoder :: you must add frames first!");
+		return;
+	}
 	
 	__instance->_fileName	= fileName;
 	__instance->_nColors	= nColors;
@@ -117,7 +120,6 @@ void ofxGifEncoder::update() {
 
 //----------------------------------------------------
 void ofxGifEncoder::_saveGIF() {
-	cout << "now saving the _saveGIF()" << endl;
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(__instance->_fileName).c_str(), TRUE, FALSE); 
 	

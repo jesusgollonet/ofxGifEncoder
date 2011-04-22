@@ -31,8 +31,6 @@ public:
 	static void addRGBFrame(unsigned char * px, int _w, int _h, float duration, int bitsPerPixel=24);
 	static void addRGBFrame(ofImage& image, float duration, int bitsPerPixel=24);
 	
-	static void setVerbose(bool $t=true){ _verbose = $t;};
-	
 	// thread saving //
 	// blocking, verbose
 	void start() {startThread(true, false);}
