@@ -34,16 +34,15 @@ class ofxGifEncoder: public ofThread {
         void stop() {stopThread();}
         void exit();
     
-        void addFrame(ofImage & image, float duration = 0.1f, int bitsPerPixel = 24);        
-        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
+        void addFrame(ofImage & image, float duration = 0.1f);        
+        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.1f);
 
 //    void addFrame();
-        static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
+        static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int _bitsPerPixel = 24);
         void save(string _fileName = "test.gif" );
     private:   
         void swapRgb(ofxGifFrame * pix);
         void threadedFunction();
-        void update();
         void doSave();
         bool bSaving;
 
@@ -53,5 +52,6 @@ class ofxGifEncoder: public ofThread {
         float   frameDuration;
         int w;
         int h;
+        int bitsPerPixel;
 };
 

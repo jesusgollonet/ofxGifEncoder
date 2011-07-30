@@ -13,42 +13,40 @@ ofxGifEncoder::ofxGifEncoder() {
 }
 
 void ofxGifEncoder::setup(int _w, int _h, int _nColors, float _frameDuration){
-    w       = _w;
-    h       = _h;
     if (nColors < 2 || nColors > 256) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder: nColors must be between 2 and 256. set to 256");
         nColors = 256;
     }
-    
+    w       = _w;
+    h       = _h;
     nColors         = _nColors;
     frameDuration   = _frameDuration;
-    bSaving         = false;
-    start(); // does this have to be inited here?
+    bitsPerPixel    = 24;
 }
 
 ofxGifEncoder::~ofxGifEncoder() {}
 
 
 //--------------------------------------------------------------
-ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, float duration, int bitsPerPixel) {
+ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, float _duration, int _bitsPerPixel) {
     ofxGifFrame * gf    = new ofxGifFrame();
     gf->pixels          = px;
     gf->width           = _w; 
     gf->height          = _h; 
-    gf->duration        = duration;
-    gf->bitsPerPixel    = bitsPerPixel;
+    gf->duration        = _duration;
+    gf->bitsPerPixel    = _bitsPerPixel;
     return gf;
 }
 
-void ofxGifEncoder::addFrame(ofImage & img, float _duration, int _bitsPerPixel) {
+void ofxGifEncoder::addFrame(ofImage & img, float _duration) {
     if(img.width != w || img.height != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
     }
-    addFrame(img.getPixels(), w, h, _duration, _bitsPerPixel);
+    addFrame(img.getPixels(), w, h, _duration);
 }
 
-void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration, int _bitsPerPixel) {
+void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration) {
     if(_w != w || _h != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
@@ -56,7 +54,7 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration,
     
     unsigned char * temp = new unsigned char[w * h * 3];
     memcpy(temp, px, w * h * 3);
-    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _duration) ;
+    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _duration, bitsPerPixel) ;
     frames.push_back(gifFrame);
 }
 
@@ -65,10 +63,7 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration,
 //--------------------------------------------------------------
 void ofxGifEncoder::save (string _fileName) {
     fileName = _fileName;
-    
-    
-    bSaving = true;
-    
+    start();
 }
 
 
@@ -76,20 +71,14 @@ void ofxGifEncoder::save (string _fileName) {
 void ofxGifEncoder::threadedFunction() {
 	while( isThreadRunning() != 0 ) {
 		if( lock() ){
-			update();
+			doSave();
 			unlock();
 			ofSleepMillis(10);
+            stop();
 		}
 	}
 }
 
-//--------------------------------------------------------------
-void ofxGifEncoder::update() {
-    if (bSaving) {
-        doSave();
-        bSaving = false;
-    }
-}
 
 void ofxGifEncoder::doSave() {
 	// create a multipage bitmap
