@@ -20,7 +20,7 @@ class testApp : public ofBaseApp{
         void windowResized(int w, int h);
         void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);    
-    
+    void exit();
         void captureFrame();
     
         vector <ofTexture *> txs; // for previewing    
@@ -30,6 +30,8 @@ class testApp : public ofBaseApp{
         int nFrames;
     
         ofVideoGrabber vid;
+    
+    ofxGifEncoder gifEncoder;
 
 };
 

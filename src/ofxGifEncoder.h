@@ -3,10 +3,12 @@
 //  ofxGifEncoder
 //
 //  Created by Jesus Gollonet on 3/20/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
-#include "ofMain.h"
+// http://github.com/jesusgollonet/ofxGifEncoder
+// adapted threaded saving, events, error checking and frame managing from Nick Hardeman.
+// http://github.com/NickHardeman/ofxGifEncoder/tree/threaded
+// Thanks!
 
+#include "ofMain.h"
 
 // similar to ofPixels
 typedef struct {
@@ -17,15 +19,29 @@ typedef struct {
 	int bitsPerPixel;
 } ofxGifFrame;
 
-
-class ofxGifEncoder {
+class ofxGifEncoder: public ofThread {
+    public:     
+        
+        ofxGifEncoder();
+        ~ofxGifEncoder();
+        
+        // thread saving
+        // blocking, verbose
+        void start() {startThread(true, false);}
+        void stop() {stopThread();}
+        void exit();
     
-    public:
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
-        static void save(vector <ofxGifFrame *> frames, string fileName = "test.gif" , int nColors = 256);
+        void save(vector <ofxGifFrame *> _frames, string _fileName = "test.gif" , int _nColors = 256);
     private:   
-        static void swapRgb(ofxGifFrame * pix);
-    
-};
+        void swapRgb(ofxGifFrame * pix);
+        void threadedFunction();
+        void update();
+        void doSave();
+        bool bSaving;
 
+        vector <ofxGifFrame *> frames;
+        string fileName;
+        int nColors;
+};
 

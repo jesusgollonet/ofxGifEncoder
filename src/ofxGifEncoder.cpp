@@ -3,13 +3,17 @@
 //  ofxGifEncoder
 //
 //  Created by Jesus Gollonet on 3/20/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
 
 #include "ofxGifEncoder.h"
 #include "FreeImage.h"
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
+
+ofxGifEncoder::ofxGifEncoder() {
+    bSaving = false;
+    start();
+}
+ofxGifEncoder::~ofxGifEncoder() {}
 
 
 //--------------------------------------------------------------
@@ -23,14 +27,27 @@ ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, 
     return gf;
 }
 
+
 //--------------------------------------------------------------
-void ofxGifEncoder::save (vector <ofxGifFrame *> frames, string fileName, int nColors) {
-    
-    if (nColors < 2 || nColors > 256) {
-        ofLog(OF_LOG_WARNING, "nColors must be between 2 and 256. your gif won't be saved");
-        return;
+void ofxGifEncoder::threadedFunction() {
+	while( isThreadRunning() != 0 ) {
+		if( lock() ){
+			update();
+			unlock();
+			ofSleepMillis(10);
+		}
+	}
+}
+
+//--------------------------------------------------------------
+void ofxGifEncoder::update() {
+    if (bSaving) {
+        doSave();
+        bSaving = false;
     }
-    
+}
+
+void ofxGifEncoder::doSave() {
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
 	
@@ -44,22 +61,22 @@ void ofxGifEncoder::save (vector <ofxGifFrame *> frames, string fileName, int nC
 		
 		// get the pixel data
 		bmp	= FreeImage_ConvertFromRawBits(
-            frames[i]->pixels, 
-            frames[i]->width,
-            frames[i]->height, 
-            frames[i]->width*(frames[i]->bitsPerPixel/8), 
-            frames[i]->bitsPerPixel, 
-            0,
-            0,
-            0, 
-            true // in of006 this (topdown) had to be false.
-        );	 
+                                           frames[i]->pixels, 
+                                           frames[i]->width,
+                                           frames[i]->height, 
+                                           frames[i]->width*(frames[i]->bitsPerPixel/8), 
+                                           frames[i]->bitsPerPixel, 
+                                           0,
+                                           0,
+                                           0, 
+                                           true // in of006 this (topdown) had to be false.
+                                           );	 
 		
 		
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
 #endif
-    		
+        
         DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
 		
         // bmp =  FreeImage_ColorQuantize(bmp, FIQ_NNQUANT);
@@ -92,6 +109,20 @@ void ofxGifEncoder::save (vector <ofxGifFrame *> frames, string fileName, int nC
 	FreeImage_Unload(bmp);
 	FreeImage_CloseMultiBitmap(multi); 
 }
+
+//--------------------------------------------------------------
+void ofxGifEncoder::save (vector <ofxGifFrame *> _frames, string _fileName, int _nColors) {
+    frames = _frames;
+    fileName = _fileName;
+    nColors = _nColors;
+    
+    bSaving = true;
+    
+    if (nColors < 2 || nColors > 256) {
+        ofLog(OF_LOG_WARNING, "nColors must be between 2 and 256. your gif won't be saved");
+        return;
+    }
+}
  
 // from ofimage
 //----------------------------------------------------
@@ -109,4 +140,8 @@ void ofxGifEncoder::swapRgb(ofxGifFrame * pix){
 			cnt++;
 		}
 	}
+}
+
+void ofxGifEncoder::exit() {
+    stop();
 }

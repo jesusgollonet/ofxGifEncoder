@@ -36,7 +36,7 @@ void testApp::keyReleased(int key){
             captureFrame();
             break;
         case 's':
-            ofxGifEncoder::save(pxs, "test.gif", 256);
+            gifEncoder.save(pxs, "test.gif", 256);
             break;
         default:
             break;
@@ -56,9 +56,6 @@ void testApp::captureFrame() {
     
     nFrames++;
 }
-
-
-
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
@@ -87,10 +84,15 @@ void testApp::windowResized(int w, int h){
 
 //--------------------------------------------------------------
 void testApp::gotMessage(ofMessage msg){
-    
+
 }
 
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){ 
     
 }
+//--------------------------------------------------------------
+void testApp::exit(){ 
+    gifEncoder.exit();
+}
+
