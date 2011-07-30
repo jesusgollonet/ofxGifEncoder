@@ -10,9 +10,22 @@
 #define DWORD uint32_t
 
 ofxGifEncoder::ofxGifEncoder() {
-    bSaving = false;
-    start();
 }
+
+void ofxGifEncoder::setup(int _w, int _h, int _nColors, float _frameDuration){
+    w       = _w;
+    h       = _h;
+    if (nColors < 2 || nColors > 256) {
+        ofLog(OF_LOG_WARNING, "ofxGifEncoder: nColors must be between 2 and 256. set to 256");
+        nColors = 256;
+    }
+    
+    nColors         = _nColors;
+    frameDuration   = _frameDuration;
+    bSaving         = false;
+    start(); // does this have to be inited here?
+}
+
 ofxGifEncoder::~ofxGifEncoder() {}
 
 
@@ -25,6 +38,37 @@ ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, 
     gf->duration        = duration;
     gf->bitsPerPixel    = bitsPerPixel;
     return gf;
+}
+
+void ofxGifEncoder::addFrame(ofImage & img, float _duration, int _bitsPerPixel) {
+    if(img.width != w || img.height != h) {
+        ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
+        return;
+    }
+    addFrame(img.getPixels(), w, h, _duration, _bitsPerPixel);
+}
+
+void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration, int _bitsPerPixel) {
+    if(_w != w || _h != h) {
+        ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
+        return;
+    }
+    
+    unsigned char * temp = new unsigned char[w * h * 3];
+    memcpy(temp, px, w * h * 3);
+    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _duration) ;
+    frames.push_back(gifFrame);
+}
+
+
+
+//--------------------------------------------------------------
+void ofxGifEncoder::save (string _fileName) {
+    fileName = _fileName;
+    
+    
+    bSaving = true;
+    
 }
 
 
@@ -50,7 +94,6 @@ void ofxGifEncoder::update() {
 void ofxGifEncoder::doSave() {
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
-	
 	FIBITMAP * bmp = NULL;
 	
 	for(int i = 0; i < frames.size(); i++ ) { 
@@ -61,18 +104,15 @@ void ofxGifEncoder::doSave() {
 		
 		// get the pixel data
 		bmp	= FreeImage_ConvertFromRawBits(
-                                           frames[i]->pixels, 
-                                           frames[i]->width,
-                                           frames[i]->height, 
-                                           frames[i]->width*(frames[i]->bitsPerPixel/8), 
-                                           frames[i]->bitsPerPixel, 
-                                           0,
-                                           0,
-                                           0, 
-                                           true // in of006 this (topdown) had to be false.
-                                           );	 
-		
-		
+            frames[i]->pixels, 
+            frames[i]->width,
+            frames[i]->height, 
+            frames[i]->width*(frames[i]->bitsPerPixel/8), 
+            frames[i]->bitsPerPixel, 
+            0, 0, 0, true // in of006 this (topdown) had to be false.
+        );	 
+    
+    
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
 #endif
@@ -108,20 +148,6 @@ void ofxGifEncoder::doSave() {
 	
 	FreeImage_Unload(bmp);
 	FreeImage_CloseMultiBitmap(multi); 
-}
-
-//--------------------------------------------------------------
-void ofxGifEncoder::save (vector <ofxGifFrame *> _frames, string _fileName, int _nColors) {
-    frames = _frames;
-    fileName = _fileName;
-    nColors = _nColors;
-    
-    bSaving = true;
-    
-    if (nColors < 2 || nColors > 256) {
-        ofLog(OF_LOG_WARNING, "nColors must be between 2 and 256. your gif won't be saved");
-        return;
-    }
 }
  
 // from ofimage

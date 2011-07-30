@@ -19,11 +19,14 @@ typedef struct {
 	int bitsPerPixel;
 } ofxGifFrame;
 
+// make an ofxGifThreadedSaver?
 class ofxGifEncoder: public ofThread {
     public:     
         
         ofxGifEncoder();
         ~ofxGifEncoder();
+    
+        void setup(int _w, int _h, int _nColors = 256, float _frameDuration = .1f);
         
         // thread saving
         // blocking, verbose
@@ -31,8 +34,12 @@ class ofxGifEncoder: public ofThread {
         void stop() {stopThread();}
         void exit();
     
+        void addFrame(ofImage & image, float duration = 0.1f, int bitsPerPixel = 24);        
+        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
+
+//    void addFrame();
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
-        void save(vector <ofxGifFrame *> _frames, string _fileName = "test.gif" , int _nColors = 256);
+        void save(string _fileName = "test.gif" );
     private:   
         void swapRgb(ofxGifFrame * pix);
         void threadedFunction();
@@ -41,7 +48,10 @@ class ofxGifEncoder: public ofThread {
         bool bSaving;
 
         vector <ofxGifFrame *> frames;
-        string fileName;
-        int nColors;
+        string  fileName;
+        int     nColors;
+        float   frameDuration;
+        int w;
+        int h;
 };
 

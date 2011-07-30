@@ -7,6 +7,8 @@ void testApp::setup(){
     vid.initGrabber(frameW,frameH);
     nFrames = 0;
 	ofBackground(50, 40, 50);
+    
+    gifEncoder.setup(frameW, frameH);
 }
 
 //--------------------------------------------------------------
@@ -36,7 +38,7 @@ void testApp::keyReleased(int key){
             captureFrame();
             break;
         case 's':
-            gifEncoder.save(pxs, "test.gif", 256);
+            gifEncoder.save("test.gif");
             break;
         default:
             break;
@@ -44,14 +46,11 @@ void testApp::keyReleased(int key){
 }
 
 void testApp::captureFrame() {
-    unsigned char * temp = new unsigned char[frameW * frameH * 3];
-    memcpy(temp, vid.getPixels(), frameW * frameH * 3);
-    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, frameW, frameH, 0.1f) ;
-    pxs.push_back(gifFrame);
+    gifEncoder.addFrame(vid.getPixels(), frameW, frameH);
     
     ofTexture * tx = new ofTexture();
     tx->allocate(frameW, frameH, GL_RGB);
-    tx->loadData(gifFrame->pixels, gifFrame->width , gifFrame->height, GL_RGB);
+    tx->loadData(vid.getPixels(), frameW, frameH, GL_RGB);
     txs.push_back(tx);
     
     nFrames++;
