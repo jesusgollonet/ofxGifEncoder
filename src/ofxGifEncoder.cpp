@@ -7,6 +7,7 @@
 //
 
 #include "ofxGifEncoder.h"
+#include "FreeImage.h"
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
 

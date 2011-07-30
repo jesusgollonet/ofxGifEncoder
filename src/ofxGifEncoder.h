@@ -20,10 +20,12 @@ typedef struct {
 
 class ofxGifEncoder {
     
-    public: 
+    public:
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int bitsPerPixel = 24);
         static void save(vector <ofxGifFrame *> frames, string fileName = "test.gif" , int nColors = 256);
-    private:
+    private:   
         static void swapRgb(ofxGifFrame * pix);
     
 };
+
+
