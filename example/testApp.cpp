@@ -9,6 +9,7 @@ void testApp::setup(){
 	ofBackground(50, 40, 50);
     
     gifEncoder.setup(frameW, frameH);
+    gifEncoder.setDitherMode(OFX_GIF_DITHER_BAYER4x4);
 }
 
 //--------------------------------------------------------------

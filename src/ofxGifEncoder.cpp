@@ -5,7 +5,7 @@
 //  Created by Jesus Gollonet on 3/20/11.
 
 #include "ofxGifEncoder.h"
-#include "FreeImage.h"
+
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
 
@@ -13,7 +13,7 @@ ofxGifEncoder::ofxGifEncoder() {
 }
 
 void ofxGifEncoder::setup(int _w, int _h, int _nColors, float _frameDuration){
-    if (nColors < 2 || nColors > 256) {
+    if (_nColors < 2 || _nColors > 256) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder: nColors must be between 2 and 256. set to 256");
         nColors = 256;
     }
@@ -22,6 +22,7 @@ void ofxGifEncoder::setup(int _w, int _h, int _nColors, float _frameDuration){
     nColors         = _nColors;
     frameDuration   = _frameDuration;
     bitsPerPixel    = 24;
+    ditherMode = OFX_GIF_DITHER_NONE;
 }
 
 ofxGifEncoder::~ofxGifEncoder() {}
@@ -58,7 +59,9 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration)
     frames.push_back(gifFrame);
 }
 
-
+void ofxGifEncoder::setDitherMode(int _ditherMode){
+    ditherMode = _ditherMode;
+}
 
 //--------------------------------------------------------------
 void ofxGifEncoder::save (string _fileName) {
@@ -114,9 +117,7 @@ void ofxGifEncoder::doSave() {
         bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)
-		// you can set a different dither pattern for each frame
-        // bmp = FreeImage_Dither(bmp, (FREE_IMAGE_DITHER)((i+1)%6));
-        //bmp = FreeImage_Dither(bmp, FID_BAYER8x8);
+        if(ditherMode > OFX_GIF_DITHER_NONE) bmp = FreeImage_Dither(bmp, (FREE_IMAGE_DITHER)ditherMode);
         
 		// clear any animation metadata used by this dib as we’ll adding our own ones 
 		FreeImage_SetMetadata(FIMD_ANIMATION, bmp, NULL, NULL); 

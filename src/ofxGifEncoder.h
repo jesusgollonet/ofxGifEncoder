@@ -9,6 +9,7 @@
 // Thanks!
 
 #include "ofMain.h"
+#include "FreeImage.h"
 
 // similar to ofPixels
 typedef struct {
@@ -19,6 +20,19 @@ typedef struct {
 	int bitsPerPixel;
 } ofxGifFrame;
 
+// done for consistency. feel free to use Freeimage versions
+enum ditherTypes {
+    OFX_GIF_DITHER_NONE         = -1,
+    OFX_GIF_DITHER_FS           = FID_FS,           // Floyd & Steinberg error diffusion
+    OFX_GIF_DITHER_BAYER4x4     = FID_BAYER4x4,		// Bayer ordered dispersed dot dithering (order 2 dithering matrix)
+    OFX_GIF_DITHER_BAYER8x8     = FID_BAYER8x8, 	// Bayer ordered dispersed dot dithering (order 3 dithering matrix)
+    OFX_GIF_DITHER_CLUSTER6x6   = FID_CLUSTER6x6,	// Ordered clustered dot dithering (order 3 - 6x6 matrix)
+    OFX_GIF_DITHER_CLUSTER8x8   = FID_CLUSTER8x8,	// Ordered clustered dot dithering (order 4 - 8x8 matrix)
+    OFX_GIF_DITHER_CLUSTER16x16 = FID_CLUSTER16x16, // Ordered clustered dot dithering (order 8 - 16x16 matrix)
+    OFX_GIF_DITHER_BAYER16x16   = FID_BAYER16x16,	// Bayer ordered dispersed dot dithering (order 4 dithering matrix)
+};
+
+
 // make an ofxGifThreadedSaver?
 class ofxGifEncoder: public ofThread {
     public:     
@@ -27,7 +41,7 @@ class ofxGifEncoder: public ofThread {
         ~ofxGifEncoder();
     
         void setup(int _w, int _h, int _nColors = 256, float _frameDuration = .1f);
-        
+        void setDitherMode(int _ditherMode = OFX_GIF_DITHER_NONE);
         // thread saving
         // blocking, verbose
         void start() {startThread(true, false);}
@@ -37,7 +51,6 @@ class ofxGifEncoder: public ofThread {
         void addFrame(ofImage & image, float duration = 0.1f);        
         void addFrame(unsigned char * px, int _w, int _h, float duration = 0.1f);
 
-//    void addFrame();
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int _bitsPerPixel = 24);
         void save(string _fileName = "test.gif" );
     private:   
@@ -53,5 +66,6 @@ class ofxGifEncoder: public ofThread {
         int w;
         int h;
         int bitsPerPixel;
+    int ditherMode;
 };
 
