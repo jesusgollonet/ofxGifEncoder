@@ -9,22 +9,24 @@
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
 
+
 ofEvent<string>	ofxGifEncoder::OFX_GIF_SAVE_FINISHED;
 
 ofxGifEncoder::ofxGifEncoder() {
 }
 
-void ofxGifEncoder::setup(int _w, int _h, int _nColors, float _frameDuration){
+void ofxGifEncoder::setup(int _w, int _h,  float _frameDuration, int _nColors){
     if (_nColors < 2 || _nColors > 256) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder: nColors must be between 2 and 256. set to 256");
         nColors = 256;
     }
     w       = _w;
     h       = _h;
-    nColors         = _nColors;
+    
     frameDuration   = _frameDuration;
+    nColors         = _nColors;
     bitsPerPixel    = 24;
-    ditherMode = OFX_GIF_DITHER_NONE;
+    ditherMode      = OFX_GIF_DITHER_NONE;
 }
 
 ofxGifEncoder::~ofxGifEncoder() {}
@@ -35,7 +37,7 @@ ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, 
     ofxGifFrame * gf    = new ofxGifFrame();
     gf->pixels          = px;
     gf->width           = _w; 
-    gf->height          = _h; 
+    gf->height          = _h;
     gf->duration        = _duration;
     gf->bitsPerPixel    = _bitsPerPixel;
     return gf;
@@ -55,10 +57,17 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration)
         return;
     }
     
+    float tempDuration = _duration;
+    if (tempDuration == 0.f) tempDuration = frameDuration; 
+    
     unsigned char * temp = new unsigned char[w * h * 3];
     memcpy(temp, px, w * h * 3);
-    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _duration, bitsPerPixel) ;
+    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, tempDuration, bitsPerPixel) ;
     frames.push_back(gifFrame);
+}
+
+void ofxGifEncoder::setNumColors(int _nColors){
+    nColors = _nColors;
 }
 
 void ofxGifEncoder::setDitherMode(int _ditherMode){
@@ -85,8 +94,9 @@ void ofxGifEncoder::threadedFunction() {
 			unlock();
 			ofSleepMillis(10);
             stop();
-            ofNotifyEvent(OFX_GIF_SAVE_FINISHED, fileName, this);
             bSaving = false;
+            ofNotifyEvent(OFX_GIF_SAVE_FINISHED, fileName, this);
+            
 		}
 	}
 }
@@ -119,10 +129,7 @@ void ofxGifEncoder::doSave() {
 #endif
         
         DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
-		
-        // bmp =  FreeImage_ColorQuantize(bmp, FIQ_NNQUANT);
-		
-		// if we want to set a reduced color palette (2 to 256);
+    
         bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)

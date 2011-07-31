@@ -8,7 +8,7 @@ void testApp::setup(){
     nFrames = 0;
 	ofBackground(50, 40, 50);
     
-    gifEncoder.setup(frameW, frameH);
+    gifEncoder.setup(frameW, frameH, .1f, 2);
     gifEncoder.setDitherMode(OFX_GIF_DITHER_BAYER4x4);
     
     ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);

@@ -40,19 +40,21 @@ class ofxGifEncoder: public ofThread {
         ofxGifEncoder();
         ~ofxGifEncoder();
     
-        void setup(int _w, int _h, int _nColors = 256, float _frameDuration = .1f);
-        void setDitherMode(int _ditherMode = OFX_GIF_DITHER_NONE);
+        void setup(int _w, int _h, float _frameDuration = 0.1f, int _nColors = 256 );
+        void setNumColors(int _nColors = 256);
+        void setDitherMode(int _ditherMode = OFX_GIF_DITHER_FS);
         
         static ofEvent<string>	OFX_GIF_SAVE_FINISHED;
-    
+
         // thread saving
         // blocking, verbose
         void start() {startThread(true, false);}
         void stop() {stopThread();}
         void exit();
-    
-        void addFrame(ofImage & image, float duration = 0.1f);        
-        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.1f);
+        
+        // if no duration is specified, we'll use default (from setup())
+        void addFrame(ofImage & image, float duration = 0.f);        
+        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.f);
 
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int _bitsPerPixel = 24);
         void save(string _fileName = "test.gif" );
