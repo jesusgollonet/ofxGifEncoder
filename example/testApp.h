@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "ofxGifEncoder.h"
 
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -22,8 +23,7 @@ class testApp : public ofBaseApp{
         void gotMessage(ofMessage msg);    
         
         void onGifSaved(string & fileName);
-    
-    void exit();
+        void exit();
         void captureFrame();
     
         vector <ofTexture *> txs; // for previewing    
@@ -34,6 +34,9 @@ class testApp : public ofBaseApp{
     
         ofVideoGrabber vid;
         ofxGifEncoder gifEncoder;
+       
+    ofImage transpGif;
+        ofImage transpPng;
 
 };
 

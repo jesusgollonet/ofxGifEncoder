@@ -10,6 +10,7 @@
 
 #include "ofMain.h"
 #include "FreeImage.h"
+#pragma once
 
 // similar to ofPixels
 typedef struct {
@@ -54,9 +55,9 @@ class ofxGifEncoder: public ofThread {
         
         // if no duration is specified, we'll use default (from setup())
         void addFrame(ofImage & image, float duration = 0.f);        
-        void addFrame(unsigned char * px, int _w, int _h, float duration = 0.f);
+        void addFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel = 24, float duration = 0.f);
 
-        static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, float duration = 0.1f, int _bitsPerPixel = 24);
+        static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel = 24, float duration = 0.1f);
         void save(string _fileName = "test.gif" );
     private:   
         void swapRgb(ofxGifFrame * pix);
@@ -71,6 +72,7 @@ class ofxGifEncoder: public ofThread {
         int w;
         int h;
         int bitsPerPixel;
+        int nChannels;
         int ditherMode;
     
     

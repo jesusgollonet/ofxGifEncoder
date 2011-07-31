@@ -25,15 +25,17 @@ void ofxGifEncoder::setup(int _w, int _h,  float _frameDuration, int _nColors){
     
     frameDuration   = _frameDuration;
     nColors         = _nColors;
-    bitsPerPixel    = 24;
+    bitsPerPixel    = 0;
+    nChannels       = 0;
     ditherMode      = OFX_GIF_DITHER_NONE;
+    bSaving         = false;
 }
 
 ofxGifEncoder::~ofxGifEncoder() {}
 
 
 //--------------------------------------------------------------
-ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, float _duration, int _bitsPerPixel) {
+ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel, float _duration ) {
     ofxGifFrame * gf    = new ofxGifFrame();
     gf->pixels          = px;
     gf->width           = _w; 
@@ -44,14 +46,17 @@ ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, 
 }
 
 void ofxGifEncoder::addFrame(ofImage & img, float _duration) {
+
     if(img.width != w || img.height != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
     }
-    addFrame(img.getPixels(), w, h, _duration);
+        printf("image type %i bpp %i \n", img.type, img.bpp);
+    
+    addFrame(img.getPixels(), w, h, img.bpp,  _duration);
 }
 
-void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration) {
+void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixel, float _duration) {
     if(_w != w || _h != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
@@ -60,9 +65,21 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, float _duration)
     float tempDuration = _duration;
     if (tempDuration == 0.f) tempDuration = frameDuration; 
     
-    unsigned char * temp = new unsigned char[w * h * 3];
-    memcpy(temp, px, w * h * 3);
-    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, tempDuration, bitsPerPixel) ;
+    nChannels = 0;
+    switch (_bitsPerPixel) {
+        case 8:     nChannels = 1;      break;
+        case 24:    nChannels = 3;      break;
+        case 32:    nChannels = 4;      break;
+        default:             
+            ofLog(OF_LOG_WARNING, "bitsPerPixel should be 8, 24 or 32. skipping frame");
+            return;
+            break;
+    }
+    printf("bpp %i nChannels %i \n", _bitsPerPixel, nChannels);
+    
+    unsigned char * temp = new unsigned char[w * h * nChannels];
+    memcpy(temp, px, w * h * nChannels);
+    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _bitsPerPixel, tempDuration) ;
     frames.push_back(gifFrame);
 }
 
@@ -103,6 +120,8 @@ void ofxGifEncoder::threadedFunction() {
 
 
 void ofxGifEncoder::doSave() {
+    
+    
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
 	FIBITMAP * bmp = NULL;
@@ -112,7 +131,7 @@ void ofxGifEncoder::doSave() {
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
 #endif
-		
+        printf("bits per pixel %i \n", frames[i]->bitsPerPixel);
 		// get the pixel data
 		bmp	= FreeImage_ConvertFromRawBits(
             frames[i]->pixels, 
@@ -122,15 +141,16 @@ void ofxGifEncoder::doSave() {
             frames[i]->bitsPerPixel, 
             0, 0, 0, true // in of006 this (topdown) had to be false.
         );	 
-    
-    
+        printf("%i is transparent \n", FreeImage_IsTransparent(bmp));
+        if (FreeImage_IsTransparent(bmp)) printf("transparent index %i \n", FreeImage_GetTransparentIndex(bmp));
+        
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
 #endif
         
         DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
     
-        bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
+        //bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)
         if(ditherMode > OFX_GIF_DITHER_NONE) bmp = FreeImage_Dither(bmp, (FREE_IMAGE_DITHER)ditherMode);

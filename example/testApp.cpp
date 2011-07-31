@@ -2,16 +2,19 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    frameW = 320;
-    frameH = 240;
+    frameW = 100;
+    frameH = 100;
     vid.initGrabber(frameW,frameH);
     nFrames = 0;
 	ofBackground(50, 40, 50);
     
-    gifEncoder.setup(frameW, frameH, .1f, 2);
-    gifEncoder.setDitherMode(OFX_GIF_DITHER_BAYER4x4);
+    gifEncoder.setup(frameW, frameH, .1f, 256);
     
     ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
+
+    transpGif.loadImage("abcde.gif");
+    transpPng.loadImage("abcde.png");
+    transpGif.setImageType(OF_IMAGE_GRAYSCALE);
 }
 
 //--------------------------------------------------------------
@@ -25,8 +28,12 @@ void testApp::draw(){
         txs[i]->draw(i* (frameW/2 + 5), frameH, frameW/2, frameH/2);
     }
     vid.draw(0, 0);
-	
+    ofEnableAlphaBlending();
+	transpGif.draw(0,0);
+    transpPng.draw(100, 0);
+    ofDisableAlphaBlending();
 	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
+
 }
 
 void testApp::onGifSaved(string &fileName) {
@@ -42,7 +49,10 @@ void testApp::keyPressed(int key){
 void testApp::keyReleased(int key){
     switch (key) {
         case ' ':
-            captureFrame();
+            //captureFrame();
+            gifEncoder.addFrame(transpGif);
+            gifEncoder.save("t.gif");
+            transpGif.saveImage("fake.gif");
             break;
         case 's':
             gifEncoder.save("test.gif");
@@ -53,7 +63,7 @@ void testApp::keyReleased(int key){
 }
 
 void testApp::captureFrame() {
-    gifEncoder.addFrame(vid.getPixels(), frameW, frameH);
+    gifEncoder.addFrame(vid.getPixels(), frameW, frameH, 3);
     
     ofTexture * tx = new ofTexture();
     tx->allocate(frameW, frameH, GL_RGB);
