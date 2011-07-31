@@ -42,6 +42,9 @@ class ofxGifEncoder: public ofThread {
     
         void setup(int _w, int _h, int _nColors = 256, float _frameDuration = .1f);
         void setDitherMode(int _ditherMode = OFX_GIF_DITHER_NONE);
+        
+        static ofEvent<string>	OFX_GIF_SAVE_FINISHED;
+    
         // thread saving
         // blocking, verbose
         void start() {startThread(true, false);}
@@ -66,6 +69,8 @@ class ofxGifEncoder: public ofThread {
         int w;
         int h;
         int bitsPerPixel;
-    int ditherMode;
+        int ditherMode;
+    
+    
 };
 

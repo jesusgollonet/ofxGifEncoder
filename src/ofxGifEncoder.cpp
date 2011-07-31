@@ -9,6 +9,8 @@
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
 
+ofEvent<string>	ofxGifEncoder::OFX_GIF_SAVE_FINISHED;
+
 ofxGifEncoder::ofxGifEncoder() {
 }
 
@@ -65,6 +67,11 @@ void ofxGifEncoder::setDitherMode(int _ditherMode){
 
 //--------------------------------------------------------------
 void ofxGifEncoder::save (string _fileName) {
+    if(bSaving) {
+        ofLog(OF_LOG_WARNING, "ofxGifEncoder is already saving. wait for OFX_GIF_SAVE_FINISHED");
+        return;
+    }
+    bSaving = true;
     fileName = _fileName;
     start();
 }
@@ -78,6 +85,8 @@ void ofxGifEncoder::threadedFunction() {
 			unlock();
 			ofSleepMillis(10);
             stop();
+            ofNotifyEvent(OFX_GIF_SAVE_FINISHED, fileName, this);
+            bSaving = false;
 		}
 	}
 }

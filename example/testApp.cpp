@@ -10,6 +10,8 @@ void testApp::setup(){
     
     gifEncoder.setup(frameW, frameH);
     gifEncoder.setDitherMode(OFX_GIF_DITHER_BAYER4x4);
+    
+    ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
 }
 
 //--------------------------------------------------------------
@@ -25,6 +27,10 @@ void testApp::draw(){
     vid.draw(0, 0);
 	
 	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
+}
+
+void testApp::onGifSaved(string &fileName) {
+    cout << "gif saved as " << fileName << endl;
 }
 
 //--------------------------------------------------------------
