@@ -151,8 +151,7 @@ void ofxGifEncoder::doSave() {
 #endif
         
         DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
-    
-        printf("frame duration %f \n", frames[i]->duration);
+
         bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)

@@ -34,9 +34,6 @@ class testApp : public ofBaseApp{
     
         ofVideoGrabber vid;
         ofxGifEncoder gifEncoder;
-       
-    ofImage transpGif;
-        ofImage transpPng;
 
 };
 

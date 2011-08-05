@@ -2,19 +2,16 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    frameW = 100;
-    frameH = 100;
-    vid.initGrabber(frameW,frameH);
+    frameW  = 320;
+    frameH  = 240;
     nFrames = 0;
-	ofBackground(50, 40, 50);
     
-    gifEncoder.setup(frameW, frameH, .1f, 256);
-    
-    ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
+    vid.initGrabber(frameW,frameH);
 
-    transpGif.loadImage("abcde.gif");
-    transpPng.loadImage("abcde.png");
-    transpGif.setImageType(OF_IMAGE_GRAYSCALE);
+    gifEncoder.setup(frameW, frameH, .25, 256);
+    ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
+    
+    ofBackground(50, 40, 50);
 }
 
 //--------------------------------------------------------------
@@ -29,8 +26,6 @@ void testApp::draw(){
     }
     vid.draw(0, 0);
     ofEnableAlphaBlending();
-	transpGif.draw(0,0);
-    transpPng.draw(100, 0);
     ofDisableAlphaBlending();
 	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
 
@@ -49,12 +44,10 @@ void testApp::keyPressed(int key){
 void testApp::keyReleased(int key){
     switch (key) {
         case ' ':
-            //captureFrame();
-            gifEncoder.addFrame(transpGif);
-            gifEncoder.save("t.gif");
-            transpGif.saveImage("fake.gif");
+            captureFrame();
             break;
         case 's':
+            cout <<"start saving\n" << endl;
             gifEncoder.save("test.gif");
             break;
         default:
@@ -63,7 +56,7 @@ void testApp::keyReleased(int key){
 }
 
 void testApp::captureFrame() {
-    gifEncoder.addFrame(vid.getPixels(), frameW, frameH, 3);
+    gifEncoder.addFrame(vid.getPixels(), frameW, frameH, 24, .1f);
     
     ofTexture * tx = new ofTexture();
     tx->allocate(frameW, frameH, GL_RGB);
