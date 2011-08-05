@@ -33,7 +33,6 @@ enum ditherTypes {
     OFX_GIF_DITHER_BAYER16x16   = FID_BAYER16x16,	// Bayer ordered dispersed dot dithering (order 4 dithering matrix)
 };
 
-
 // make an ofxGifThreadedSaver?
 class ofxGifEncoder: public ofThread {
     public:     
@@ -44,6 +43,7 @@ class ofxGifEncoder: public ofThread {
         void setup(int _w, int _h, float _frameDuration = 0.1f, int _nColors = 256 );
         void setNumColors(int _nColors = 256);
         void setDitherMode(int _ditherMode = OFX_GIF_DITHER_FS);
+        void setFrameDuration(float _duration); // for all gifs;
         
         static ofEvent<string>	OFX_GIF_SAVE_FINISHED;
 

@@ -51,7 +51,6 @@ void ofxGifEncoder::addFrame(ofImage & img, float _duration) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
     }
-        printf("image type %i bpp %i \n", img.type, img.bpp);
     
     addFrame(img.getPixels(), w, h, img.bpp,  _duration);
 }
@@ -75,7 +74,6 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixe
             return;
             break;
     }
-    printf("bpp %i nChannels %i \n", _bitsPerPixel, nChannels);
     
     unsigned char * temp = new unsigned char[w * h * nChannels];
     memcpy(temp, px, w * h * nChannels);
@@ -91,6 +89,14 @@ void ofxGifEncoder::setDitherMode(int _ditherMode){
     ditherMode = _ditherMode;
 }
 
+void ofxGifEncoder::setFrameDuration(float _duration){
+    for (int i = 0; i < frames.size(); i++) {
+        frames[i]->duration = _duration;
+    }
+}
+
+
+
 //--------------------------------------------------------------
 void ofxGifEncoder::save (string _fileName) {
     if(bSaving) {
@@ -99,7 +105,7 @@ void ofxGifEncoder::save (string _fileName) {
     }
     bSaving = true;
     fileName = _fileName;
-    start();
+    if(!isThreadRunning()) start();
 }
 
 
@@ -107,21 +113,20 @@ void ofxGifEncoder::save (string _fileName) {
 void ofxGifEncoder::threadedFunction() {
 	while( isThreadRunning() != 0 ) {
 		if( lock() ){
-			doSave();
+            
+            if(bSaving) {
+                doSave();
+                bSaving = false;
+                ofNotifyEvent(OFX_GIF_SAVE_FINISHED, fileName, this);
+            }
+
 			unlock();
 			ofSleepMillis(10);
-            stop();
-            bSaving = false;
-            ofNotifyEvent(OFX_GIF_SAVE_FINISHED, fileName, this);
-            
 		}
 	}
 }
 
-
 void ofxGifEncoder::doSave() {
-    
-    
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
 	FIBITMAP * bmp = NULL;
@@ -131,7 +136,6 @@ void ofxGifEncoder::doSave() {
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
 #endif
-        printf("bits per pixel %i \n", frames[i]->bitsPerPixel);
 		// get the pixel data
 		bmp	= FreeImage_ConvertFromRawBits(
             frames[i]->pixels, 
@@ -141,8 +145,6 @@ void ofxGifEncoder::doSave() {
             frames[i]->bitsPerPixel, 
             0, 0, 0, true // in of006 this (topdown) had to be false.
         );	 
-        printf("%i is transparent \n", FreeImage_IsTransparent(bmp));
-        if (FreeImage_IsTransparent(bmp)) printf("transparent index %i \n", FreeImage_GetTransparentIndex(bmp));
         
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
@@ -150,7 +152,8 @@ void ofxGifEncoder::doSave() {
         
         DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
     
-        //bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
+        printf("frame duration %f \n", frames[i]->duration);
+        bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
 		// dithering :)
         if(ditherMode > OFX_GIF_DITHER_NONE) bmp = FreeImage_Dither(bmp, (FREE_IMAGE_DITHER)ditherMode);
