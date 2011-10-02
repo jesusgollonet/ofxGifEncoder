@@ -150,7 +150,7 @@ void ofxGifEncoder::doSave() {
         swapRgb(frames[i]);
 #endif
         
-        DWORD frameDuration = (DWORD) frames[i]->duration * 1000.f;
+        DWORD frameDuration = (DWORD) (frames[i]->duration * 1000.f);
 
         bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
 		
