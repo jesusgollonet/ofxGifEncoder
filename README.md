@@ -43,6 +43,15 @@ threaded saving, events, error checking and frame managing adapted from [Nick Ha
 
 	- Transaparent gifs!
 	- Provide option to choose palette?
+	- proper frame compression
+	
+## NOTES:
+
+one thing that it's not quite there yet is appropiate gif compression, so if your images are big or you have many frames you may end up with unnecesarily fat gifs. 
+
+If you use it, I'd love to see what for. Let me know at {myname}@{nameandsurname}.com !
+	
+	
 	
 	
 
