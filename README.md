@@ -14,7 +14,9 @@ create an instance of ofxGifEncoder
 		
 call setup 
 	
-	gifEncoder.setup(frameW, frameH, nColors, frameDuration);
+	gifEncoder.setup(frameW, frameH, frameDuration, nColors);
+	
+(frameDuration is a float in seconds and nColors is an int from 0 to 256.)
 
 optionally  :) (see dithering patterns on the h file)
 		
