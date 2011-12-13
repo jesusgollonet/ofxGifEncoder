@@ -199,3 +199,9 @@ void ofxGifEncoder::swapRgb(ofxGifFrame * pix){
 void ofxGifEncoder::exit() {
     stop();
 }
+
+void ofxGifEncoder::reset() {
+    frames.clear();
+}
+
+
