@@ -75,10 +75,18 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixe
             break;
     }
     
-    unsigned char * temp = new unsigned char[w * h * nChannels];
-    memcpy(temp, px, w * h * nChannels);
-    ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _bitsPerPixel, tempDuration) ;
+	
+	ofxGifFrame * gifFrame    = new ofxGifFrame();
+    gifFrame->pixels          = new unsigned char[w * h * nChannels];
+	memcpy( gifFrame->pixels, px, w * h * nChannels);
+    gifFrame->width           = w; 
+    gifFrame->height          = h;
+    gifFrame->duration        = tempDuration;
+    gifFrame->bitsPerPixel    = _bitsPerPixel;
+	
+	
     frames.push_back(gifFrame);
+	
 }
 
 void ofxGifEncoder::setNumColors(int _nColors){
@@ -176,6 +184,8 @@ void ofxGifEncoder::doSave() {
 	
 	FreeImage_Unload(bmp);
 	FreeImage_CloseMultiBitmap(multi); 
+	
+	clear();
 }
  
 // from ofimage
@@ -200,8 +210,10 @@ void ofxGifEncoder::exit() {
     stop();
 }
 
-void ofxGifEncoder::reset() {
-    frames.clear();
+void ofxGifEncoder::clear() {
+	for(vector<ofxGifFrame*>::const_iterator it = frames.begin(); it != frames.end(); it++) delete *it;
+	frames.clear();
+    stop();
 }
 
 
