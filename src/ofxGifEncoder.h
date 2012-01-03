@@ -52,7 +52,7 @@ class ofxGifEncoder: public ofThread {
         void start() {startThread(true, false);}
         void stop() {stopThread();}
         void exit();
-		void reset();
+		void clear();
         
         // if no duration is specified, we'll use default (from setup())
         void addFrame(ofImage & image, float duration = 0.f);        
