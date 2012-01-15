@@ -129,9 +129,10 @@ void ofxGifEncoder::threadedFunction() {
 void ofxGifEncoder::doSave() {
 	// create a multipage bitmap
 	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
-	FIBITMAP * bmp = NULL;
+	
 	
 	for(int i = 0; i < frames.size(); i++ ) { 
+        FIBITMAP * bmp = NULL;
 		// we need to swap the channels if we're on little endian (see ofImage::swapRgb);
 #ifdef TARGET_LITTLE_ENDIAN
         swapRgb(frames[i]);
@@ -150,31 +151,48 @@ void ofxGifEncoder::doSave() {
         swapRgb(frames[i]);
 #endif
         
-        DWORD frameDuration = (DWORD) (frames[i]->duration * 1000.f);
-
-        bmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
-		
-		// dithering :)
-        if(ditherMode > OFX_GIF_DITHER_NONE) bmp = FreeImage_Dither(bmp, (FREE_IMAGE_DITHER)ditherMode);
+        FIBITMAP * quantizedBmp = NULL;
+        FIBITMAP * ditheredBmp  = NULL;
+        FIBITMAP * processedBmp = NULL;
         
-		// clear any animation metadata used by this dib as we’ll adding our own ones 
-		FreeImage_SetMetadata(FIMD_ANIMATION, bmp, NULL, NULL); 
+        
+        quantizedBmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
+        processedBmp = quantizedBmp;
+        
+		// dithering :)
+        if(ditherMode > OFX_GIF_DITHER_NONE) {
+            ditheredBmp = FreeImage_Dither(processedBmp, (FREE_IMAGE_DITHER)ditherMode);
+            processedBmp = ditheredBmp;
+        } 
+        
+        DWORD frameDuration = (DWORD) (frames[i]->duration * 1000.f);
+        
+		// clear any animation metadata used by this dib as we’ll adding our own ones         
+		FreeImage_SetMetadata(FIMD_ANIMATION, processedBmp, NULL, NULL); 
 		// add animation tags to dib[i] 
 		FITAG *tag = FreeImage_CreateTag(); 
-		
 		if(tag) { 
 			FreeImage_SetTagKey(tag, "FrameTime"); 
 			FreeImage_SetTagType(tag, FIDT_LONG); 
 			FreeImage_SetTagCount(tag, 1); 
 			FreeImage_SetTagLength(tag, 4); 
 			FreeImage_SetTagValue(tag, &frameDuration); 
-			FreeImage_SetMetadata(FIMD_ANIMATION, bmp, FreeImage_GetTagKey(tag), tag); 
+			FreeImage_SetMetadata(FIMD_ANIMATION, processedBmp, FreeImage_GetTagKey(tag), tag); 
 			FreeImage_DeleteTag(tag); 
 		} 
-		FreeImage_AppendPage(multi, bmp); 
-	} 
+        
+		FreeImage_AppendPage(multi, processedBmp); 
+                
+        // clear freeimage stuff
+        if(bmp          != NULL) FreeImage_Unload(bmp);
+        if(quantizedBmp != NULL) FreeImage_Unload(quantizedBmp);
+        if(ditheredBmp  != NULL) FreeImage_Unload(ditheredBmp);
+        
+        // no need to unload processedBmp, as it points to either of the above
+        
+    } 
 	
-	FreeImage_Unload(bmp);
+	
 	FreeImage_CloseMultiBitmap(multi); 
 }
  
