@@ -189,11 +189,9 @@ void ofxGifEncoder::doSave() {
         if(ditheredBmp  != NULL) FreeImage_Unload(ditheredBmp);
         
         // no need to unload processedBmp, as it points to either of the above
-        
     } 
-	
-	
 	FreeImage_CloseMultiBitmap(multi); 
+    
 }
  
 // from ofimage
@@ -219,6 +217,14 @@ void ofxGifEncoder::exit() {
 }
 
 void ofxGifEncoder::reset() {
+    if(bSaving) {
+        ofLog(OF_LOG_WARNING, "ofxGifEncoder is saving. wait for OFX_GIF_SAVE_FINISHED to reset");
+        return;
+    }
+    for (int i = 0; i < frames.size(); i++) {
+        delete frames[i]->pixels;
+        delete frames[i];
+    }
     frames.clear();
 }
 
