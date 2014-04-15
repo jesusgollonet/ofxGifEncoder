@@ -10,16 +10,10 @@
 
 #include "ofMain.h"
 #include "FreeImage.h"
+#include "ofxGifFrame.h"
 #pragma once
 
-// similar to ofPixels
-typedef struct {
-	unsigned char * pixels;
-    int width;
-    int height;
-    float duration;  // seconds
-	int bitsPerPixel;
-} ofxGifFrame;
+
 
 // done for consistency. feel free to use Freeimage versions
 enum ditherTypes {
