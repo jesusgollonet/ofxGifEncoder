@@ -1,26 +1,27 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
     frameW  = 320;
     frameH  = 240;
     nFrames = 0;
     
     vid.initGrabber(frameW,frameH);
-
+    
     gifEncoder.setup(frameW, frameH, .25, 256);
-    ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
+    ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &ofApp::onGifSaved);
     
     ofBackground(50, 40, 50);
+
 }
 
 //--------------------------------------------------------------
-void testApp::update(){ 
+void ofApp::update(){
     vid.update();
 }
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
     for (int i = 0; i < nFrames; i ++) {
         txs[i]->draw(i* (frameW/2 + 5), frameH, frameW/2, frameH/2);
     }
@@ -28,20 +29,30 @@ void testApp::draw(){
     ofEnableAlphaBlending();
     ofDisableAlphaBlending();
 	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
-
 }
 
-void testApp::onGifSaved(string &fileName) {
+void ofApp::onGifSaved(string &fileName) {
     cout << "gif saved as " << fileName << endl;
 }
 
+void ofApp::captureFrame() {
+    gifEncoder.addFrame(vid.getPixels(), frameW, frameH, 24, .1f);
+    
+    ofTexture * tx = new ofTexture();
+    tx->allocate(frameW, frameH, GL_RGB);
+    tx->loadData(vid.getPixels(), frameW, frameH, GL_RGB);
+    txs.push_back(tx);
+    
+    nFrames++;
+}
+
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
 
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){
+void ofApp::keyReleased(int key){
     switch (key) {
         case ' ':
             captureFrame();
@@ -55,53 +66,42 @@ void testApp::keyReleased(int key){
     }
 }
 
-void testApp::captureFrame() {
-    gifEncoder.addFrame(vid.getPixels(), frameW, frameH, 24, .1f);
-    
-    ofTexture * tx = new ofTexture();
-    tx->allocate(frameW, frameH, GL_RGB);
-    tx->loadData(vid.getPixels(), frameW, frameH, GL_RGB);
-    txs.push_back(tx);
-    
-    nFrames++;
-}
-
 //--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
-    
-}
-
-//--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
-    
-}
-
-//--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
-    
-}
-
-//--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
-    
-}
-
-//--------------------------------------------------------------
-void testApp::windowResized(int w, int h){
-    
-}
-
-//--------------------------------------------------------------
-void testApp::gotMessage(ofMessage msg){
+void ofApp::mouseMoved(int x, int y ){
 
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){ 
-    
+void ofApp::mouseDragged(int x, int y, int button){
+
 }
+
 //--------------------------------------------------------------
-void testApp::exit(){ 
+void ofApp::mousePressed(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseReleased(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::windowResized(int w, int h){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::gotMessage(ofMessage msg){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo){ 
+
+}
+
+//--------------------------------------------------------------
+void ofApp::exit(){
     gifEncoder.exit();
 }
-
