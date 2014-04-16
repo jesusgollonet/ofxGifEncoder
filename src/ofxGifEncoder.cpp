@@ -8,7 +8,7 @@
 
 // for some reason we're not seeing this from freeimage
 #define DWORD uint32_t
-
+#define BYTE uint8_t
 
 ofEvent<string>	ofxGifEncoder::OFX_GIF_SAVE_FINISHED;
 
@@ -128,9 +128,7 @@ void ofxGifEncoder::threadedFunction() {
 
 void ofxGifEncoder::doSave() {
 	// create a multipage bitmap
-	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE); 
-	
-	
+	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE);
 	for(int i = 0; i < frames.size(); i++ ) { 
         processFrame(i, multi);
     }
@@ -144,6 +142,8 @@ void ofxGifEncoder::processFrame(int frameNum, FIMULTIBITMAP *multi){
 #ifdef TARGET_LITTLE_ENDIAN
     swapRgb(frames[frameNum]);
 #endif
+    
+    
     // get the pixel data
     bmp	= FreeImage_ConvertFromRawBits(
                                        frames[frameNum]->pixels,
@@ -154,6 +154,13 @@ void ofxGifEncoder::processFrame(int frameNum, FIMULTIBITMAP *multi){
                                        0, 0, 0, true // in of006 this (topdown) had to be false.
                                        );
     
+    FIBITMAP * bmpConverted;
+    if (FreeImage_IsTransparent(bmp)){
+        ofLog() << "image is transaprent!";
+        bmp = FreeImage_ConvertTo24Bits(bmp);
+    }
+    ofLog() << FreeImage_IsTransparent(bmp);
+    
 #ifdef TARGET_LITTLE_ENDIAN
     swapRgb(frames[frameNum]);
 #endif
@@ -163,8 +170,21 @@ void ofxGifEncoder::processFrame(int frameNum, FIMULTIBITMAP *multi){
     FIBITMAP * processedBmp = NULL;
     
     
-    quantizedBmp = FreeImage_ColorQuantizeEx(bmp, FIQ_NNQUANT, nColors);
+    quantizedBmp = FreeImage_ColorQuantizeEx(bmp, FIQ_WUQUANT, 4);
     processedBmp = quantizedBmp;
+    
+    
+//    RGBQUAD *pal = FreeImage_GetPalette(bmp);
+//    BYTE	Transparency[1];
+//    Transparency[0] = 0x00;
+    
+    //       FreeImage_SetTransparencyTable(bmp, Transparency, 1);
+    //		FreeImage_SetTransparent(bmp, true);
+    
+    //bmp = FreeImage_Dither(bmp, FID_BAYER8x8);
+    FreeImage_SetTransparentIndex(processedBmp,0);
+    FreeImage_SetTransparentIndex(processedBmp,1);
+    
     
     // dithering :)
     if(ditherMode > OFX_GIF_DITHER_NONE) {
