@@ -2,7 +2,7 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    transparent.loadImage("transparent.png");
+    transparent.loadImage("transparent2.png");
     transparent2.allocate(transparent.getWidth(), transparent.getHeight(), OF_IMAGE_COLOR);
     frameW  = transparent.getWidth();
     frameH  = transparent.getHeight();

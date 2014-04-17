@@ -44,6 +44,7 @@ class ofxGifEncoder: public ofThread {
         void save(string _fileName = "test.gif" );
     private:
         void calculatePalette(FIBITMAP * bmp);
+        int getClosestToGreenScreenPaletteColorIndex();
         ofColor greenScreenColor;
         vector <ofColor> palette;
         ofxGifFrame * convertTo24BitsWithGreenScreen(ofxGifFrame * frame);

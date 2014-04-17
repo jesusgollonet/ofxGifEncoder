@@ -145,7 +145,25 @@ void ofxGifEncoder::calculatePalette(FIBITMAP * bmp){
         palette.push_back(ofColor(pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue));
         ofLog() << palette.at(i);
     }
+}
 
+int ofxGifEncoder::getClosestToGreenScreenPaletteColorIndex(){
+    ofLog() << "computing closest palete color";
+
+    float minDistance = 100000;
+    int closestIndex = 0;
+    ofVec3f greenScreenVec(greenScreenColor.r, greenScreenColor.g, greenScreenColor.b);
+    for (int i = 0; i < palette.size(); i++) {
+        
+        ofVec3f currentVec(palette.at(i).r, palette.at(i).g, palette.at(i).b);
+        float currentDistance = currentVec.distance(greenScreenVec);
+        if (currentDistance < minDistance){
+            minDistance = currentDistance;
+            closestIndex = i;
+        }
+    }
+    return closestIndex;
+    
 }
 
 void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
@@ -192,7 +210,9 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
     
     calculatePalette(processedBmp);
     
-    FreeImage_SetTransparentIndex(processedBmp,0);
+    ofLog() << getClosestToGreenScreenPaletteColorIndex();
+    
+    FreeImage_SetTransparentIndex(processedBmp,getClosestToGreenScreenPaletteColorIndex());
 
     
     // dithering :)
