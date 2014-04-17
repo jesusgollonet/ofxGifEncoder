@@ -138,6 +138,16 @@ void ofxGifEncoder::doSave() {
     
 }
 
+void ofxGifEncoder::calculatePalette(FIBITMAP * bmp){
+    RGBQUAD *pal = FreeImage_GetPalette(bmp);
+    
+    for (int i = 0; i < 256; i++) {
+        palette.push_back(ofColor(pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue));
+        ofLog() << palette.at(i);
+    }
+
+}
+
 void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
     FIBITMAP * bmp = NULL;
     // we need to swap the channels if we're on little endian (see ofImage::swapRgb);
@@ -147,8 +157,6 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
         ofLog() << "image is transaprent!";
         frame = convertTo24BitsWithGreenScreen(frame);
     }
-    
-    
     
 #ifdef TARGET_LITTLE_ENDIAN
     swapRgb(frame);
@@ -182,24 +190,8 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
     processedBmp = quantizedBmp;
     
     
-    RGBQUAD *pal = FreeImage_GetPalette(processedBmp);
-    ofColor * palette = new ofColor[4];
-    for (int i = 0; i < 4; i++) {
-        //
-        // palette[i].r = pal[i].rgbRed;
-        // palette[i].g = pal[i].rgbGreen;
-        // palette[i].b = pal[i].rgbBlue;
-        
-//        printf(" %i ----------------   \n",i );
-//        printf("red  %i green %i blue %i \n",pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue);
-    }
-//    BYTE	Transparency[1];
-//    Transparency[0] = 0x00;
+    calculatePalette(processedBmp);
     
-    //       FreeImage_SetTransparencyTable(bmp, Transparency, 1);
-    //		FreeImage_SetTransparent(bmp, true);
-
-    //bmp = FreeImage_Dither(bmp, FID_BAYER8x8);
     FreeImage_SetTransparentIndex(processedBmp,0);
 
     
