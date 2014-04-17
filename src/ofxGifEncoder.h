@@ -43,8 +43,9 @@ class ofxGifEncoder: public ofThread {
         static ofxGifFrame * createGifFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel = 24, float duration = 0.1f);
         void save(string _fileName = "test.gif" );
     private:
-    
-        void processFrame(int frameNum, FIMULTIBITMAP * multi);
+        ofColor greenScreenColor;
+        ofxGifFrame * convertTo24BitsWithGreenScreen(ofxGifFrame * frame);
+        void processFrame(ofxGifFrame * frame, FIMULTIBITMAP * multi);
         void swapRgb(ofxGifFrame * pix);
         void threadedFunction();
         void doSave();

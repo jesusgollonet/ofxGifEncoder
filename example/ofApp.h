@@ -23,7 +23,6 @@ class ofApp : public ofBaseApp{
         void onGifSaved(string & fileName);
         void exit();
         void captureFrame();
-        
     
         vector <ofTexture *> txs; // for previewing
         vector <ofxGifFrame *> pxs;
@@ -35,7 +34,7 @@ class ofApp : public ofBaseApp{
         ofxGifEncoder gifEncoder;
     
         ofImage transparent;
-    ofImage transparent2;
+        ofImage transparent2;
         ofImage nonTransparent;
 
 		

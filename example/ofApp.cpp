@@ -4,26 +4,6 @@
 void ofApp::setup(){
     transparent.loadImage("transparent.png");
     transparent2.allocate(transparent.getWidth(), transparent.getHeight(), OF_IMAGE_COLOR);
-    ofColor otherColor(20,0,223);
-    for (int i = 0; i < transparent.getWidth(); i++) {
-        for (int j = 0; j < transparent.getHeight(); j++) {
-//            ofLog() << transparent.getColor(i, j);
-            ofColor c = transparent.getColor(i, j);
-            
-            float normalAlpha = c.a / 254.f;
-            float inverseAlpha = 1.f - normalAlpha ;
-//            ofLog() << inverseAlpha;
-            transparent2.setColor(i, j, ofColor(
-                                                c.r * normalAlpha + (otherColor.r * inverseAlpha) ,
-                                                c.g * normalAlpha + (otherColor.g * inverseAlpha),
-                                                c.b * normalAlpha + (otherColor.b *inverseAlpha)
-                                                )
-                                  );
-        }
-    }
-//    transparent.setImageType(OF_IMAGE_COLOR);
-    transparent2.update();
-    nonTransparent.loadImage("non-transparent.jpg");
     frameW  = transparent.getWidth();
     frameH  = transparent.getHeight();
     nFrames = 0;
@@ -58,11 +38,17 @@ void ofApp::onGifSaved(string &fileName) {
 }
 
 void ofApp::captureFrame() {
-    gifEncoder.addFrame(transparent2.getPixels(), frameW, frameH, 24, .1f);
+    gifEncoder.addFrame(
+                        transparent.getPixels(),
+                        transparent.getWidth(),
+                        transparent.getHeight(),
+                        transparent.getPixelsRef().getBitsPerPixel(),
+                        .1f
+                        );
     
     ofTexture * tx = new ofTexture();
-    tx->allocate(frameW, frameH, GL_RGB);
-    tx->loadData(transparent2.getPixels(), frameW, frameH, GL_RGB);
+    tx->allocate(frameW, frameH, GL_RGBA);
+    tx->loadData(transparent.getPixels(), frameW, frameH, GL_RGBA);
     txs.push_back(tx);
     
     nFrames++;
