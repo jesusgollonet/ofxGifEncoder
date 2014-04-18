@@ -2,6 +2,10 @@
 
 Export animated gifs from openframeworks. 
 
+![Shameless plug](http://ofxgif.jesusgollonet.com/img/plug1.gif)
+
+Tested with [openframeworks](http://openframeworks.cc/) 0.8.1 osx. 
+
 ___
 
 ## USAGE:
@@ -30,7 +34,7 @@ when you're ready to save
 	
 	gifEncoder.save("test.gif");
 	
-the saving is now threaded, so it won't block your app. If you want to do something when saving is finished, you can subscribe to the event OFX_GIF_SAVE_FINISHED
+If you want to do something when saving is finished, you can subscribe to the event OFX_GIF_SAVE_FINISHED *
 	
 	ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
 	...
@@ -43,8 +47,8 @@ threaded saving, events, error checking and frame managing adapted from [Nick Ha
 
 ## TODO:
 
-	- Transaparent gifs!
-	- Provide option to choose palette?
+	x Transaparent gifs (currently testing)
+	- Provide option to choose palette
 	- proper frame compression
 	
 ## NOTES:
@@ -53,9 +57,4 @@ one thing that it's not quite there yet is appropiate gif compression, so if you
 
 If you use it, I'd love to see what for. Let me know at {myname}@{nameandsurname}.com !
 	
-	
-	
-	
-
-
-
+![Shameless plug](http://ofxgif.jesusgollonet.com/img/plug2.gif)
