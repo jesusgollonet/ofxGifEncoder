@@ -204,7 +204,7 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
     FIBITMAP * processedBmp = NULL;
     
     
-    quantizedBmp = FreeImage_ColorQuantizeEx(bmp, FIQ_WUQUANT, 4);
+    quantizedBmp = FreeImage_ColorQuantize(bmp, FIQ_WUQUANT);
     processedBmp = quantizedBmp;
     
     
