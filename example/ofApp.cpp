@@ -2,13 +2,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    transparent.loadImage("transparent2.png");
-    transparent2.allocate(transparent.getWidth(), transparent.getHeight(), OF_IMAGE_COLOR);
-    frameW  = transparent.getWidth();
-    frameH  = transparent.getHeight();
     nFrames = 0;
+    frameW  = 320;
+    frameH  = 240;
     
-//    vid.initGrabber(frameW,frameH);
+    vid.initGrabber(frameW,frameH);
     
     gifEncoder.setup(frameW, frameH, .25, 256);
     ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &ofApp::onGifSaved);
@@ -19,7 +17,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-//    vid.update();
+    vid.update();
 }
 
 //--------------------------------------------------------------
@@ -27,7 +25,7 @@ void ofApp::draw(){
     for (int i = 0; i < nFrames; i ++) {
         txs[i]->draw(i* (frameW/2 + 5), frameH, frameW/2, frameH/2);
     }
-//    vid.draw(0, 0);
+    vid.draw(0, 0);
     ofEnableAlphaBlending();
     ofDisableAlphaBlending();
 	ofDrawBitmapString("KEYS\n----\nspacebar: capture frame\ns: save gif", frameW+10, 20);
@@ -39,16 +37,16 @@ void ofApp::onGifSaved(string &fileName) {
 
 void ofApp::captureFrame() {
     gifEncoder.addFrame(
-                        transparent.getPixels(),
-                        transparent.getWidth(),
-                        transparent.getHeight(),
-                        transparent.getPixelsRef().getBitsPerPixel(),
+                        vid.getPixels(),
+                        vid.getWidth(),
+                        vid.getHeight(),
+                        vid.getPixelsRef().getBitsPerPixel(),
                         .1f
                         );
     
     ofTexture * tx = new ofTexture();
-    tx->allocate(frameW, frameH, GL_RGBA);
-    tx->loadData(transparent.getPixels(), frameW, frameH, GL_RGBA);
+    tx->allocate(frameW, frameH, GL_RGB);
+    tx->loadData(vid.getPixels(), frameW, frameH, GL_RGB);
     txs.push_back(tx);
     
     nFrames++;

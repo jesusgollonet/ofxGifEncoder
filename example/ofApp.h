@@ -32,10 +32,5 @@ class ofApp : public ofBaseApp{
         
         ofVideoGrabber vid;
         ofxGifEncoder gifEncoder;
-    
-        ofImage transparent;
-        ofImage transparent2;
-        ofImage nonTransparent;
 
-		
 };
