@@ -53,6 +53,19 @@ threaded saving, events, error checking and frame managing adapted from [Nick Ha
 	
 ## NOTES:
 
+### Transparency:
+
+Experimental transparency support has been added. However, I haven't found a nice way to gracefully convert from a 32bit alpha image to an 8bit alpha image with Freeimage (openframeworks image library). 
+
+The process I'm following is sort of a green screen (check `ofxGifEncoder::convertTo24BitsWithGreenScreen`):
+
+- substitute the values in the alpha channel of the 32bit transparent image by a predefined color (`ofColor(0,255,0)` -> bright green)
+- convert to 24bit 
+- convert to 8 bit using FreeImage_ColorQuantize, which takes care of palettizing the image (and therefore choosing the final colors)
+- find in the palette the color closest to our predefined color, and set that as transparent.
+
+### Gif size
+
 one thing that it's not quite there yet is appropiate gif compression, so if your images are big or you have many frames you may end up with unnecesarily fat gifs. 
 
 If you use it, I'd love to see what for. Let me know at {myname}@{nameandsurname}.com !
