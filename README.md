@@ -48,8 +48,8 @@ If you want to do something when saving is finished, you can subscribe to the ev
 
 ```C++
 ofAddListener(ofxGifEncoder::OFX_GIF_SAVE_FINISHED, this, &testApp::onGifSaved);
-	...
-	onGifSaved(string & fileName)
+...
+onGifSaved(string & fileName)
 ```
 ## THANKS!	
 	
@@ -74,6 +74,13 @@ The process I'm following is sort of a green screen (check `ofxGifEncoder::conve
 - convert to 24bit 
 - convert to 8 bit using FreeImage_ColorQuantize, which takes care of palettizing the image (and therefore choosing the final colors)
 - find in the palette the color closest to our predefined color, and set that as transparent.
+
+At the moment there are 2 flaws with transparency:
+
+- If there is a color in your image which it's closest to the palettized green screen color, that one will be picked for alpha. You'll probably see big green areas in your exported gif.
+- Images with alpha gradients will have green added on the semi transparent parts.
+
+I'm thinking of fixes for both. 
 
 ### Gif size
 
