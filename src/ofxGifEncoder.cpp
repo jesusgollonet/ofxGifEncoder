@@ -207,12 +207,11 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
     quantizedBmp = FreeImage_ColorQuantize(bmp, FIQ_WUQUANT);
     processedBmp = quantizedBmp;
     
-    
-    calculatePalette(processedBmp);
-    
-    ofLog() << getClosestToGreenScreenPaletteColorIndex();
-    
-    FreeImage_SetTransparentIndex(processedBmp,getClosestToGreenScreenPaletteColorIndex());
+    if (nChannels == 4){
+        calculatePalette(processedBmp);
+        FreeImage_SetTransparentIndex(processedBmp,getClosestToGreenScreenPaletteColorIndex());
+    }
+
 
     
     // dithering :)
