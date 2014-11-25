@@ -89,3 +89,7 @@ one thing that it's not quite there yet is appropiate gif compression, so if you
 If you use it, I'd love to see what for. Let me know: me@jesusgollonet.com
 	
 ![Shameless plug](http://ofxgif.jesusgollonet.com/img/plug2.gif)
+
+### LICENSE
+
+This addon is distributed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License) which means you can use it in any context: commercial or non-commercial, public or private, open or closed source.
