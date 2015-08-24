@@ -16,7 +16,15 @@
 #pragma once
 
 class ofxGifEncoder: public ofThread {
-    public:     
+    public:
+    
+        typedef struct {
+            unsigned char * pixels;
+            int width;
+            int height;
+            float duration;  // seconds
+            int bitsPerPixel;
+        } ofxGifFrame;
         
         ofxGifEncoder();
         ~ofxGifEncoder();

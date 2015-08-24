@@ -36,7 +36,7 @@ ofxGifEncoder::~ofxGifEncoder() {}
 
 
 //--------------------------------------------------------------
-ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel, float _duration ) {
+ofxGifEncoder::ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, int _w, int _h, int _bitsPerPixel, float _duration ) {
     ofxGifFrame * gf    = new ofxGifFrame();
     gf->pixels          = px;
     gf->width           = _w; 
@@ -247,7 +247,7 @@ void ofxGifEncoder::processFrame(ofxGifFrame * frame, FIMULTIBITMAP *multi){
 
 }
 
-ofxGifFrame * ofxGifEncoder::convertTo24BitsWithGreenScreen(ofxGifFrame * frame){
+ofxGifEncoder::ofxGifFrame * ofxGifEncoder::convertTo24BitsWithGreenScreen(ofxGifFrame * frame){
     ofColor otherColor(0,255,0);
 
     int width = frame->width;
