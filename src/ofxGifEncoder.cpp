@@ -141,6 +141,7 @@ void ofxGifEncoder::doSave() {
 void ofxGifEncoder::calculatePalette(FIBITMAP * bmp){
     RGBQUAD *pal = FreeImage_GetPalette(bmp);
     
+	palette.clear();
     for (int i = 0; i < 256; i++) {
         palette.push_back(ofColor(pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue));
         ofLog() << palette.at(i);
