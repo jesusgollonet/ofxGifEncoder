@@ -10,7 +10,6 @@
 
 #include "ofMain.h"
 #include "FreeImage.h"
-#include "ofxGifFrame.h"
 #include "ofxGifDitherTypes.h"
 
 #pragma once
