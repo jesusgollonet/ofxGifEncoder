@@ -10,7 +10,6 @@
 
 #include "ofMain.h"
 #include "FreeImage.h"
-#include "ofxGifFrame.h"
 #include "ofxGifDitherTypes.h"
 
 #pragma once
@@ -38,7 +37,7 @@ class ofxGifEncoder: public ofThread {
 
         // thread saving
         // blocking, verbose
-        void start() {startThread(true, false);}
+        void start() {startThread();}
         void stop() {stopThread();}
         void exit();
 		void reset();

@@ -53,7 +53,7 @@ void ofxGifEncoder::addFrame(ofImage & img, float _duration) {
         return;
     }
     
-    addFrame(img.getPixels(), w, h, img.getPixels().getBitsPerPixel(),  _duration);
+    addFrame(img.getPixels().getData(), w, h, img.getPixels().getBitsPerPixel(),  _duration);
 }
 
 void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixel, float _duration) {
@@ -141,6 +141,7 @@ void ofxGifEncoder::doSave() {
 void ofxGifEncoder::calculatePalette(FIBITMAP * bmp){
     RGBQUAD *pal = FreeImage_GetPalette(bmp);
     
+	palette.clear();
     for (int i = 0; i < 256; i++) {
         palette.push_back(ofColor(pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue));
         ofLog() << palette.at(i);
