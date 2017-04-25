@@ -8,6 +8,10 @@ Tested with [openframeworks](http://openframeworks.cc/) 0.8.1 osx.
 
 ___
 
+## UNMAINTAINED : (
+
+Unfortunately I am not using openframeworks these days and haven't had time to bring my addons up to date with recent versions. I don't have the time to review and test pull requests, so if you have an active fork that's up to date let me know and I'll include the link here.
+
 ## USAGE:
 
 There is a simple example included
