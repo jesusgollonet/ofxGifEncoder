@@ -46,17 +46,17 @@ ofxGifEncoder::ofxGifFrame * ofxGifEncoder::createGifFrame(unsigned char * px, i
     return gf;
 }
 
-void ofxGifEncoder::addFrame(ofImage & img, float _duration) {
+void ofxGifEncoder::addFrame(ofImage & img, float _duration, bool overWrite) {
 
     if(img.getWidth() != w || img.getHeight() != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
     }
     
-    addFrame(img.getPixels(), w, h, img.getPixels().getBitsPerPixel(),  _duration);
+    addFrame(img.getPixels().getData(), w, h, img.getPixels().getBitsPerPixel(),  _duration, overWrite);
 }
 
-void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixel, float _duration) {
+void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixel, float _duration, bool overWrite) {
     if(_w != w || _h != h) {
         ofLog(OF_LOG_WARNING, "ofxGifEncoder::addFrame image dimensions don't match, skipping frame");
         return;
@@ -79,7 +79,18 @@ void ofxGifEncoder::addFrame(unsigned char *px, int _w, int _h, int _bitsPerPixe
     unsigned char * temp = new unsigned char[w * h * nChannels];
     memcpy(temp, px, w * h * nChannels);
     ofxGifFrame * gifFrame   = ofxGifEncoder::createGifFrame(temp, w, h, _bitsPerPixel, tempDuration) ;
-    frames.push_back(gifFrame);
+	if (!overWrite) {
+		frames.push_back(gifFrame);
+	}
+	else {
+		// ensure the vector is not empty
+		if (frames.size() > 0) {
+			frames.back() = gifFrame;  // overwrite current
+		}
+		else {
+			frames.push_back(gifFrame);
+		}
+	}
 }
 
 void ofxGifEncoder::setNumColors(int _nColors){
@@ -128,9 +139,10 @@ void ofxGifEncoder::threadedFunction() {
 }
 
 void ofxGifEncoder::doSave() {
-	// create a multipage bitmap
-	FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, ofToDataPath(fileName).c_str(), TRUE, FALSE);
-	for(int i = 0; i < frames.size(); i++ ) {
+    // create a multipage bitmap
+    string path = ofToDataPath(fileName, true);
+    FIMULTIBITMAP *multi = FreeImage_OpenMultiBitmap(FIF_GIF, path.c_str(), TRUE, FALSE);
+    for(int i = 0; i < frames.size(); i++ ) {
         ofxGifFrame * currentFrame = frames[i];
         processFrame(currentFrame, multi);
     }
@@ -141,6 +153,7 @@ void ofxGifEncoder::doSave() {
 void ofxGifEncoder::calculatePalette(FIBITMAP * bmp){
     RGBQUAD *pal = FreeImage_GetPalette(bmp);
     
+	palette.clear();
     for (int i = 0; i < 256; i++) {
         palette.push_back(ofColor(pal[i].rgbRed, pal[i].rgbGreen, pal[i].rgbBlue));
         ofLog() << palette.at(i);
